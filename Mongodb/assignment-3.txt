@@ -1,0 +1,131 @@
+								assignment-3:
+							       ---------------
+
+
+1) Import the attached data into a new database (e.g. boxOffice) and
+collection (e.g. movieStats)
+
+
+a) importing:
+
+query:
+
+mongoimport boxoffice.json -d boxOffice -c movieStats --jsonArray --drop
+
+
+b) finding the imported data:
+
+
+query:
+
+boxOffice> db.movieStats.find().pretty()
+
+output:
+
+[
+  {
+    _id: ObjectId('67d016102905248a88c4e591'),
+    title: 'The Final Exam Returns',
+    meta: { rating: 9.5, aired: 2018, runtime: 100 },
+    viewers: 1300000,
+    projectedViewers: 1550000,
+    genre: [ 'thriller', 'drama', 'action' ]
+  },
+  {
+    _id: ObjectId('67d016102905248a88c4e592'),
+    title: 'High-Speed Learning',
+    meta: { rating: 9.3, aired: 2016, runtime: 60 },
+    viewers: 370000,
+    projectedViewers: 1000000,
+    genre: [ 'thriller', 'action' ]
+  },
+  {
+    _id: ObjectId('67d016102905248a88c4e593'),
+    title: 'Master the Subject',
+    meta: { rating: 8.5, aired: 2014, runtime: 90 },
+    viewers: 590378,
+    projectedViewers: 500000,
+    genre: [ 'action', 'thriller' ]
+  }
+]
+
+
+
+2) Search all movies that have a rating higher than 9.2 and a runtime lower
+than 100 minutes
+
+
+query:
+
+db.movieStats.find({
+	$and:[
+		{"meta.rating": {$gt: 9.2}}, 
+		{"meta.runtime": {$lt: 100}} 
+	]
+})
+
+
+
+output:
+
+[
+  {
+    _id: ObjectId('67d016102905248a88c4e591'),
+    title: 'The Final Exam Returns',
+    meta: { rating: 9.5, aired: 2018, runtime: 100 },
+    viewers: 1300000,
+    projectedViewers: 1550000,
+    genre: [ 'thriller', 'drama', 'action' ]
+  },
+  {
+    _id: ObjectId('67d016102905248a88c4e592'),
+    title: 'High-Speed Learning',
+    meta: { rating: 9.3, aired: 2016, runtime: 60 },
+    viewers: 370000,
+    projectedViewers: 1000000,
+    genre: [ 'thriller', 'action' ]
+  },
+  {
+    _id: ObjectId('67d016102905248a88c4e593'),
+    title: 'Master the Subject',
+    meta: { rating: 8.5, aired: 2014, runtime: 90 },
+    viewers: 590378,
+    projectedViewers: 500000,
+    genre: [ 'action', 'thriller' ]
+  }
+]
+
+
+
+
+4) Search all movies where visitors exceeded expected Visitors
+
+
+query:
+db.movieStats.find({
+	$expr: {
+		$gt: ["$viewers", "$projectedViewers"] 
+	}
+}).pretty()
+
+
+output:
+
+[
+  {
+    _id: ObjectId('67d016102905248a88c4e593'),
+    title: 'Master the Subject',
+    meta: { rating: 8.5, aired: 2014, runtime: 90 },
+    viewers: 590378,
+    projectedViewers: 500000,
+    genre: [ 'action', 'thriller' ]
+  }
+]
+
+
+
+
+
+
+
+

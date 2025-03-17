@@ -1,0 +1,168 @@
+
+ **1. Create (Insert Data)**
+
+- **Insert one document**:
+
+
+db.collection.insertOne({name: "John", age: 28});
+
+
+**Insert multiple documents**:
+
+
+db.collection.insertMany([{name: "Alice", age: 24}, {name: "Bob", age: 30}]);
+```
+
+---
+ **2. Read (Query Data)**
+
+- **Find one document**:
+
+
+db.collection.findOne({name: "John"});
+```
+
+- **Find all documents**:
+
+db.collection.find();
+
+
+- **Find with conditions**:
+
+db.collection.find({age: {$gt: 25}});  // age > 25
+```
+
+- **Find with projection (select specific fields)**:
+
+
+db.collection.find({name: "John"}, {age: 1, _id: 0});  // Only age, exclude _id
+```
+
+---
+
+**3. Update Data**
+
+- **Update one document**:
+
+db.collection.updateOne({name: "John"}, {$set: {age: 29}});
+```
+
+- **Update multiple documents**:
+
+db.collection.updateMany({age: {$lt: 30}}, {$set: {status: "young"}});
+```
+
+- **Upsert (update or insert if not found)**:
+
+db.collection.updateOne({name: "Eve"}, {$set: {age: 40}}, {upsert: true});
+```
+
+---
+
+ **4. Delete Data**
+
+- **Delete one document**:
+
+
+db.collection.deleteOne({name: "John"});
+```
+
+- **Delete multiple documents**:
+
+
+db.collection.deleteMany({age: {$lt: 30}});
+```
+
+---
+**5. Projection**
+
+- **Select specific fields**:
+
+
+db.collection.find({}, {name: 1, _id: 0});  // Show only 'name', hide '_id'
+```
+
+- **Exclude a field**:
+
+
+db.collection.find({}, {age: 0});  // Hide 'age'
+```
+
+---
+
+**6. Operators in Queries**
+
+- **$eq** (equal to):
+
+db.collection.find({age: {$eq: 28}});
+```
+
+- **$gt** (greater than):
+
+
+db.collection.find({age: {$gt: 25}});
+```
+
+- **$lt** (less than):
+
+
+db.collection.find({age: {$lt: 30}});
+```
+
+- **$in** (in a list):
+
+
+db.collection.find({age: {$in: [25, 28, 30]}});
+```
+
+- **$and** (combine conditions):
+
+
+db.collection.find({$and: [{age: {$gt: 25}}, {city: "New York"}]});
+```
+
+- **$or** (either condition):
+
+
+db.collection.find({$or: [{age: {$lt: 30}}, {city: "New York"}]});
+```
+
+---
+
+ **7. Sorting and Limiting Results**
+
+- **Sort results (ascending or descending)**:
+
+
+db.collection.find().sort({age: 1});  // Ascending
+db.collection.find().sort({age: -1});  // Descending
+```
+
+- **Limit results**:
+
+
+db.collection.find().limit(3);  // Show only 3 results
+```
+
+---
+
+ **8. Count Documents**
+
+
+db.collection.countDocuments({age: {$gt: 25}});
+```
+
+---
+
+**9. Drop a Collection or Database**
+
+- **Drop a collection**:
+
+db.collection.drop();
+```
+
+- **Drop a database**:
+
+db.dropDatabase();
+```
+

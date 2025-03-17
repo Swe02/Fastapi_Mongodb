@@ -1,0 +1,206 @@
+								assignment-1 
+							       --------------
+
+//question-1:
+
+db.patients.insertMany([
+  {
+    "firstName": "Swetha",
+    "lastName": "Sri",
+    "age": 22,
+    "history": [
+      { "disease": "cough", "treatment": "tablets" },
+      { "disease": "cold", "treatment": "tablets" }
+    ]
+  },
+  {
+    "firstName": "Rahesh",
+    "lastName": "Kumar",
+    "age": 23,
+    "history": [
+      { "disease": "tooth pain", "treatment": "tablets" }
+    ]
+  },
+  {
+    "firstName": "Vishnu",
+    "lastName": "kumar",
+    "age": 21,
+    "history": [
+      { "disease": "acne", "treatment": "ointment" }
+    ]
+  }
+]);
+
+
+
+
+//find()
+
+db.patients.find().pretty()
+[
+  {
+    "_id": ObjectId("..."),
+    "firstName": "Swetha",
+    "lastName": "Sri",
+    "age": 22,
+    "history": [
+      { "disease": "cough", "treatment": "tablets" },
+      { "disease": "cold", "treatment": "tablets" }
+    ]
+  },
+  {
+    "_id": ObjectId("..."),
+    "firstName": "Rahesh",
+    "lastName": "Kumar",
+    "age": 23,
+    "history": [
+      { "disease": "tooth pain", "treatment": "tablets" }
+    ]
+  },
+  {
+    "_id": ObjectId("..."),
+    "firstName": "Vishnu",
+    "lastName": "kumar",
+    "age": 21,
+    "history": [
+      { "disease": "acne", "treatment": "ointment" }
+    ]
+  }
+]
+
+
+
+//question-2
+
+
+
+db.patients.updateOne(
+  { "firstName": "Swetha", "history.disease": "cold" },
+  { 
+    $set: { 
+      "age": 23, 
+      "lastName": "Kumar", 
+      "history.$.treatment": "warm water"
+    }
+  }
+);
+
+//result 
+{
+  "_id": ObjectId("..."),
+  "firstName": "Swetha",
+  "lastName": "Kumar",
+  "age": 23,
+  "history": [
+    { "disease": "cough", "treatment": "tablets" },
+    { "disease": "cold", "treatment": "warm water" }
+  ]
+}
+
+
+
+//find()
+
+hospital> db.patients.find().pretty()
+[
+  {
+
+  "firstName": "Swetha",
+  "lastName": "Kumar",
+  "age": 23,
+  "history": [
+    { "disease": "cough", "treatment": "tablets" },
+    { "disease": "cold", "treatment": "warm water" }
+  ]
+}
+{
+    "firstName": "Rahesh",
+    "lastName": "Kumar",
+    "age": 23,
+    "history": [
+      { "disease": "tooth pain", "treatment": "tablets" }
+    ]
+  },
+  {
+    "firstName": "Vishnu",
+    "lastName": "kumar",
+    "age": 21,
+    "history": [
+      { "disease": "acne", "treatment": "ointment" }
+    ]
+  }
+
+]
+
+
+
+
+
+//question-3:
+
+
+db.patients.updateOne(
+  { "firstName": "Rahesh" },
+  { $set: { "age": 30 } }
+);
+
+
+//result
+
+{
+  "_id": ObjectId("..."),
+  "firstName": "Rahesh",
+  "lastName": "Kumar",
+  "age": 30,
+  "history": [
+    { "disease": "tooth pain", "treatment": "tablets" }
+  ]
+}
+
+
+
+db.patients.find({ age: { $gt: 25 } }).pretty()
+
+[
+  {
+    "_id": ObjectId("..."),
+    "firstName": "Rahesh",
+    "lastName": "Kumar",
+    "age": 30,
+    "history": [
+      { "disease": "tooth pain", "treatment": "tablets" }
+    ]
+  }
+]
+
+
+
+//question-4:
+
+
+db.patients.deleteMany({ "history.disease": "cold" });
+
+
+hospital> db.patients.find().pretty()
+[
+ {
+    "firstName": "Rahesh",
+    "lastName": "Kumar",
+    "age": 23,
+    "history": [
+      { "disease": "tooth pain", "treatment": "tablets" }
+    ]
+  },
+  {
+    "firstName": "Vishnu",
+    "lastName": "kumar",
+    "age": 21,
+    "history": [
+      { "disease": "acne", "treatment": "ointment" }
+    ]
+  }
+
+]
+
+
+

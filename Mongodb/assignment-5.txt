@@ -1,0 +1,163 @@
+									assignment-5
+								       ---------------
+
+
+
+
+1) Create a new collection ("sports") and upsert two new documents into it
+(with these fields: "title", "requiresTeam")
+
+
+a) query:
+
+db.sports.updateMany({}, {$set: {sportName: "Tennis", teamRequired: false}}, {upsert: true})
+
+
+output:
+
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d11e8e0172019c793a354f'),
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+
+b) query:
+
+db.sports.find().pretty()
+
+output:
+
+[
+  {
+    _id: ObjectId('67d11e8e0172019c793a354f'),
+    teamRequired: false,
+    sportName: 'Tennis'
+  }
+]
+
+
+c) query:
+
+db.sports.updateMany({sportName: "Basketball"}, {$set: {teamRequired: true}}, {upsert: true})
+
+
+output:
+
+{
+  acknowledged: true,
+  insertedId: ObjectId('67d11f680172019c793a357e'),
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+
+d) query:
+
+db.sports.find().pretty() 
+
+output:
+
+[
+  {
+    _id: ObjectId('67d11e8e0172019c793a354f'),
+    teamRequired: false,
+    sportName: 'Tennis'
+  },
+  {
+    _id: ObjectId('67d11f680172019c793a357e'),
+    sportName: 'Basketball',
+    teamRequired: true
+  }
+]
+
+
+2) Update all documents which do require a team by adding a new field with
+the minimum amount of players required
+
+a) query:
+
+db.sports.updateMany({teamRequired: true},{$set: {minimumPlayersRequired: 5}})
+
+output:
+
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+
+b) query:
+
+db.sports.find().pretty() 
+
+output:
+
+
+[
+  {
+    _id: ObjectId('67d11e8e0172019c793a354f'),
+    teamRequired: false,
+    sportName: 'Tennis'
+  },
+  {
+    _id: ObjectId('67d11f680172019c793a357e'),
+    sportName: 'Basketball',
+    teamRequired: true,
+    minimumPlayersRequired: 5
+  }
+]
+
+
+
+
+3) Update all documents that require a team by increasing the number of
+required players by 10
+
+a) query:
+
+db.sports.updateMany({teamRequired: true},{$inc: {minimumPlayersRequired: 10}})
+
+
+output:
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+
+
+b) query:
+
+db.sports.find().pretty() 
+
+output:
+
+
+[
+  {
+    _id: ObjectId('67d11e8e0172019c793a354f'),
+    teamRequired: false,
+    sportName: 'Tennis'
+  },
+  {
+    _id: ObjectId('67d11f680172019c793a357e'),
+    sportName: 'Basketball',
+    teamRequired: true,
+    minimumPlayersRequired: 15
+  }
+]
+
+
+
+
