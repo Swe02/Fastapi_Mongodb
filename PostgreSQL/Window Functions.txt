@@ -1,0 +1,524 @@
+                                ------------Window Functions--------
+
+Window functions perform calculations across a group of rows related to the current row, without collapsing the rows into a single result. This allows you to calculate things like running totals, ranks, averages, and more, while keeping all the rows in the result set.
+
+--- Return the Running Total of Domestic Takings for Each Movie (Age Certificate) Ordered by Release Date for English Language Movies Only
+
+SELECT movie_name,
+       domestic_takings,
+       age_certification,
+       SUM(domestic_takings) OVER (PARTITION BY age_certification ORDER BY release_date) AS running_total
+FROM movies
+WHERE language = 'English'
+ORDER BY release_date;
+
+
+Assumed Data for `movies` Table
+
+| movie_name       | domestic_takings | age_certification | release_date | language |
+|------------------|------------------|-------------------|--------------|----------|
+| Movie A          | 1000000          | PG                | 2020-01-01   | English  |
+| Movie B          | 2000000          | PG                | 2020-02-01   | English  |
+| Movie C          | 1500000          | 12                | 2020-03-01   | English  |
+| Movie D          | 3000000          | 12                | 2020-04-01   | English  |
+| Movie E          | 2500000          | PG                | 2020-05-01   | English  |
+
+
+Resulting Table Output
+
+| movie_name       | domestic_takings | age_certification | running_total |
+|------------------|------------------|-------------------|---------------|
+| Movie A          | 1000000          | PG                | 1000000       |
+| Movie B          | 2000000          | PG                | 3000000       |
+| Movie E          | 2500000          | PG                | 5500000       |
+| Movie C          | 1500000          | 12                | 1500000       |
+| Movie D          | 3000000          | 12                | 4500000       |
+
+
+
+---Return the Moving/Running Minimum, Maximum, and Average Movie Length for Each Director's Nationality, Ordered by Movie Name
+
+SELECT movie_name,
+       director_nationality,
+       MIN(movie_length) OVER (PARTITION BY director_nationality ORDER BY movie_name) AS running_min_length,
+       MAX(movie_length) OVER (PARTITION BY director_nationality ORDER BY movie_name) AS running_max_length,
+       AVG(movie_length) OVER (PARTITION BY director_nationality ORDER BY movie_name) AS running_avg_length
+FROM movies
+ORDER BY movie_name;
+
+
+Assumed Data for `movies` Table**
+
+| movie_name       | director_nationality | movie_length | language |
+|------------------|----------------------|--------------|----------|
+| Movie A          | USA                  | 120          | English  |
+| Movie B          | USA                  | 150          | English  |
+| Movie C          | UK                   | 90           | English  |
+| Movie D          | USA                  | 100          | English  |
+| Movie E          | UK                   | 110          | English  |
+
+
+Resulting Table Output:**
+
+| movie_name       | director_nationality | running_min_length | running_max_length | running_avg_length |
+|------------------|----------------------|--------------------|--------------------|--------------------|
+| Movie A          | USA                  | 120                | 120                | 120                |
+| Movie B          | USA                  | 120                | 150                | 135                |
+| Movie D          | USA                  | 100                | 150                | 123.33             |
+| Movie C          | UK                   | 90                 | 90                 | 90                 |
+| Movie E          | UK                   | 90                 | 110                | 100                |
+
+
+
+
+
+
+
+                                               --------ROW NUMBER()-------
+
+
+Assumed Data for `movies` Table:**
+
+| movie_name | release_date | box_office_revenue |
+|------------|--------------|--------------------|
+| Movie A    | 2020-01-01   | 1000000            |
+| Movie B    | 2020-02-01   | 2000000            |
+| Movie C    | 2020-03-01   | 1500000            |
+| Movie D    | 2020-04-01   | 3000000            |
+| Movie E    | 2020-05-01   | 2500000            |
+
+Example Query with `ROW_NUMBER()`:
+
+
+SELECT movie_name,
+       release_date,
+       box_office_revenue,
+       ROW_NUMBER() OVER (ORDER BY box_office_revenue DESC) AS row_num
+FROM movies;
+```
+
+### **Resulting Table Output:**
+
+| movie_name | release_date | box_office_revenue | row_num |
+|------------|--------------|--------------------|---------|
+| Movie D    | 2020-04-01   | 3000000            | 1       |
+| Movie E    | 2020-05-01   | 2500000            | 2       |
+| Movie B    | 2020-02-01   | 2000000            | 3       |
+| Movie C    | 2020-03-01   | 1500000            | 4       |
+| Movie A    | 2020-01-01   | 1000000            | 5       |
+
+
+### **Using `ROW_NUMBER()` with `PARTITION BY`:**
+
+If you want to restart the numbering for each partition (e.g., group by movie genre or director), you can use `PARTITION BY`.
+
+
+SELECT movie_name,
+       director_nationality,
+       box_office_revenue,
+       ROW_NUMBER() OVER (PARTITION BY director_nationality ORDER BY box_office_revenue DESC) AS row_num
+FROM movies;
+
+
+ **Resulting Table Output:**
+
+| movie_name | director_nationality | box_office_revenue | row_num |
+|------------|----------------------|--------------------|---------|
+| Movie D    | USA                  | 3000000            | 1       |
+| Movie E    | USA                  | 2500000            | 2       |
+| Movie B    | USA                  | 2000000            | 3       |
+| Movie C    | UK                   | 1500000            | 1       |
+| Movie A    | UK                   | 1000000            | 2       |
+
+
+
+
+
+                                   -------RANK AND DENSE RANK----
+
+Both `RANK()` and `DENSE_RANK()` are window functions used to assign ranks to rows within a partition of a result set. They are similar in purpose but differ in how they handle ties (rows with the same value).
+
+.
+Example Use Case for `RANK()`**:
+
+Let’s assume we have a `movies` table with columns: `movie_name`, `box_office_revenue`.
+
+| movie_name | box_office_revenue |
+|------------|--------------------|
+| Movie A    | 3000000            |
+| Movie B    | 2000000            |
+| Movie C    | 3000000            |
+| Movie D    | 1500000            |
+| Movie E    | 2000000            |
+
+Query with `RANK()`**:
+
+SELECT movie_name,
+       box_office_revenue,
+       RANK() OVER (ORDER BY box_office_revenue DESC) AS movie_rank
+FROM movies;
+
+
+*Output**:
+
+| movie_name | box_office_revenue | movie_rank |
+|------------|--------------------|------------|
+| Movie A    | 3000000            | 1          |
+| Movie C    | 3000000            | 1          |
+| Movie B    | 2000000            | 3          |
+| Movie E    | 2000000            | 3          |
+| Movie D    | 1500000            | 5          |
+
+
+Query with `DENSE_RANK()`
+
+SELECT movie_name,
+       box_office_revenue,
+       DENSE_RANK() OVER (ORDER BY box_office_revenue DESC) AS movie_rank
+FROM movies;
+
+
+#### **Output**:
+
+| movie_name | box_office_revenue | movie_rank |
+|------------|--------------------|------------|
+| Movie A    | 3000000            | 1          |
+| Movie C    | 3000000            | 1          |
+| Movie B    | 2000000            | 2          |
+| Movie E    | 2000000            | 2          |
+| Movie D    | 1500000            | 3          |
+
+
+*Key Differences Between `RANK()` and `DENSE_RANK()`**:
+
+| Output Gap      | Yes, it skips ranks (1, 1, 3, 5) | No, it continues with consecutive ranks (1, 1, 2, 2, 3) |
+
+
+
+                          -------FIRST AND LAST VALUE-----
+
+
+movies Table:
+
+| movie_name | director   | release_date | box_office_revenue |
+|------------|------------|--------------|--------------------|
+| Movie A    | Director X | 2020-01-01   | 1000000            |
+| Movie B    | Director X | 2020-02-01   | 2000000            |
+| Movie C    | Director Y | 2020-03-01   | 3000000            |
+| Movie D    | Director Y | 2020-04-01   | 2000000            |
+| Movie E    | Director X | 2020-05-01   | 2000000            |
+
+---
+
+1. `FIRST_VALUE()` Query and Output:
+
+
+SELECT movie_name,
+       FIRST_VALUE(box_office_revenue) OVER (PARTITION BY director ORDER BY release_date) AS first_revenue
+FROM movies;
+
+
+ Output:
+
+| movie_name | director   | first_revenue |
+|------------|------------|---------------|
+| Movie A    | Director X | 1000000       |
+| Movie B    | Director X | 1000000       |
+| Movie E    | Director X | 1000000       |
+| Movie C    | Director Y | 3000000       |
+| Movie D    | Director Y | 3000000       |
+
+---
+
+2. `LAST_VALUE()` Query and Output:
+
+
+SELECT movie_name,
+       LAST_VALUE(box_office_revenue) OVER (PARTITION BY director ORDER BY release_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_revenue
+FROM movies;
+
+Output:
+
+| movie_name | director   | last_revenue |
+|------------|------------|--------------|
+| Movie A    | Director X | 2000000      |
+| Movie B    | Director X | 2000000      |
+| Movie E    | Director X | 2000000      |
+| Movie C    | Director Y | 3000000      |
+| Movie D    | Director Y | 3000000      |
+
+
+                                       ---------LAG FUNCTION-----
+
+Allows you to access data from a previous row in the current set, based on the `ORDER BY` clause. It helps in comparing values from the current row with those from a preceding row within the same result set or partition.
+
+
+
+Assume we have the following `sales` table:
+
+| product_name | sale_date  | sale_amount |
+|--------------|------------|-------------|
+| Product A    | 2020-01-01 | 1000        |
+| Product B    | 2020-01-05 | 1500        |
+| Product A    | 2020-02-01 | 2000        |
+| Product A    | 2020-03-01 | 2500        |
+| Product B    | 2020-03-01 | 1200        |
+
+ Using `LAG()` to Compare Current and Previous Sale Amount**
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       LAG(sale_amount, 1) OVER (PARTITION BY product_name ORDER BY sale_date) AS previous_sale_amount
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | previous_sale_amount |
+|--------------|------------|-------------|----------------------|
+| Product A    | 2020-01-01 | 1000        | NULL                 |
+| Product A    | 2020-02-01 | 2000        | 1000                 |
+| Product A    | 2020-03-01 | 2500        | 2000                 |
+| Product B    | 2020-01-05 | 1500        | NULL                 |
+| Product B    | 2020-03-01 | 1200        | 1500                 |
+
+ 
+Using `LAG()` with a Default Value[0]**
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       LAG(sale_amount, 1, 0) OVER (PARTITION BY product_name ORDER BY sale_date) AS previous_sale_amount
+FROM sales;
+
+
+Output:
+
+| product_name | sale_date  | sale_amount | previous_sale_amount |
+|--------------|------------|-------------|----------------------|
+| Product A    | 2020-01-01 | 1000        | 0                    |
+| Product A    | 2020-02-01 | 2000        | 1000                 |
+| Product A    | 2020-03-01 | 2500        | 2000                 |
+| Product B    | 2020-01-05 | 1500        | 0                    |
+| Product B    | 2020-03-01 | 1200        | 1500                 |
+
+
+
+
+
+                                        -----------LEAD FUNCTION--------
+
+
+Allows you to access data from the **next row** in the result set, based on the `ORDER BY` clause. It is useful when you need to compare the value of the current row with the value from a subsequent row.
+
+ the following `sales` table:
+
+| product_name | sale_date  | sale_amount |
+|--------------|------------|-------------|
+| Product A    | 2020-01-01 | 1000        |
+| Product B    | 2020-01-05 | 1500        |
+| Product A    | 2020-02-01 | 2000        |
+| Product A    | 2020-03-01 | 2500        |
+| Product B    | 2020-03-01 | 1200        |
+
+ Using `LEAD()` to Compare Current Sale Amount with the Next Sale**
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       LEAD(sale_amount, 1) OVER (PARTITION BY product_name ORDER BY sale_date) AS next_sale_amount
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | next_sale_amount |
+|--------------|------------|-------------|------------------|
+| Product A    | 2020-01-01 | 1000        | 2000             |
+| Product A    | 2020-02-01 | 2000        | 2500             |
+| Product A    | 2020-03-01 | 2500        | NULL             |
+| Product B    | 2020-01-05 | 1500        | 1200             |
+| Product B    | 2020-03-01 | 1200        | NULL             |
+
+Using `LEAD()` with a Default Value**
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       LEAD(sale_amount, 1, 0) OVER (PARTITION BY product_name ORDER BY sale_date) AS next_sale_amount
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | next_sale_amount |
+|--------------|------------|-------------|------------------|
+| Product A    | 2020-01-01 | 1000        | 2000             |
+| Product A    | 2020-02-01 | 2000        | 2500             |
+| Product A    | 2020-03-01 | 2500        | 0                |
+| Product B    | 2020-01-05 | 1500        | 1200             |
+| Product B    | 2020-03-01 | 1200        | 0                |
+
+
+                                        --------NTH VALUE--------
+
+
+ Used to return the **n-th value** from a result set, based on the `ORDER BY` clause. It allows you to retrieve a specific value from a specific position within the window or partition.
+
+
+Assume we have the following `sales` table:
+
+| product_name | sale_date  | sale_amount |
+|--------------|------------|-------------|
+| Product A    | 2020-01-01 | 1000        |
+| Product B    | 2020-01-05 | 1500        |
+| Product A    | 2020-02-01 | 2000        |
+| Product A    | 2020-03-01 | 2500        |
+| Product B    | 2020-03-01 | 1200        |
+
+Using `NTH_VALUE()` to Retrieve the 2nd Sale Amount for Each Product**
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       NTH_VALUE(sale_amount, 2) OVER (PARTITION BY product_name ORDER BY sale_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS second_sale_amount
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | second_sale_amount |
+|--------------|------------|-------------|--------------------|
+| Product A    | 2020-01-01 | 1000        | 2000               |
+| Product A    | 2020-02-01 | 2000        | 2000               |
+| Product A    | 2020-03-01 | 2500        | 2000               |
+| Product B    | 2020-01-05 | 1500        | 1200               |
+| Product B    | 2020-03-01 | 1200        | 1200               |
+
+ Using `NTH_VALUE()` to Retrieve the 1st Sale Amount**
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       NTH_VALUE(sale_amount, 1) OVER (PARTITION BY product_name ORDER BY sale_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS first_sale_amount
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | first_sale_amount |
+|--------------|------------|-------------|-------------------|
+| Product A    | 2020-01-01 | 1000        | 1000              |
+| Product A    | 2020-02-01 | 2000        | 1000              |
+| Product A    | 2020-03-01 | 2500        | 1000              |
+| Product B    | 2020-01-05 | 1500        | 1500              |
+| Product B    | 2020-03-01 | 1200        | 1500              |
+
+
+                      -------------CUME_DIST()` Function-----
+
+ calculates the cumulative distribution of a value within a partition of a result set.
+
+Assume we have the following `sales` table:
+
+| product_name | sale_date  | sale_amount |
+|--------------|------------|-------------|
+| Product A    | 2020-01-01 | 1000        |
+| Product B    | 2020-01-05 | 1500        |
+| Product A    | 2020-02-01 | 2000        |
+| Product A    | 2020-03-01 | 2500        |
+| Product B    | 2020-03-01 | 1200        |
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       CUME_DIST() OVER (PARTITION BY product_name ORDER BY sale_amount) AS cume_dist
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | cume_dist |
+|--------------|------------|-------------|-----------|
+| Product A    | 2020-01-01 | 1000        | 0.3333    |
+| Product A    | 2020-02-01 | 2000        | 0.6667    |
+| Product A    | 2020-03-01 | 2500        | 1.0000    |
+| Product B    | 2020-01-05 | 1500        | 0.5000    |
+| Product B    | 2020-03-01 | 1200        | 1.0000    |
+
+
+---
+                       --------------- `PERCENT_RANK()` Function----------
+
+ calculates the relative rank of a row within its partition as a percentage. It compares the value of each row to the other rows and returns a value between 0 and 1, where 0 represents the lowest value in the partition, and 1 represents the highest.
+
+
+
+Assume we have the same `sales` table as before.
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       PERCENT_RANK() OVER (PARTITION BY product_name ORDER BY sale_amount) AS percent_rank
+FROM sales;
+
+Output:
+
+| product_name | sale_date  | sale_amount | percent_rank |
+|--------------|------------|-------------|--------------|
+| Product A    | 2020-01-01 | 1000        | 0.0000       |
+| Product A    | 2020-02-01 | 2000        | 0.5000       |
+| Product A    | 2020-03-01 | 2500        | 1.0000       |
+| Product B    | 2020-01-05 | 1500        | 0.0000       |
+| Product B    | 2020-03-01 | 1200        | 1.0000       |
+
+
+
+                        ------------ `NTILE()` Function-------
+
+
+That distributes the rows of a partition into a specified number of buckets or groups (tiles). The function assigns a bucket number to each row in the partition based on its position within the ordered set.
+
+
+
+Assume we have the following `sales` table:
+
+| product_name | sale_date  | sale_amount |
+|--------------|------------|-------------|
+| Product A    | 2020-01-01 | 1000        |
+| Product B    | 2020-01-05 | 1500        |
+| Product A    | 2020-02-01 | 2000        |
+| Product A    | 2020-03-01 | 2500        |
+| Product B    | 2020-03-01 | 1200        |
+
+
+SELECT product_name,
+       sale_date,
+       sale_amount,
+       NTILE(3) OVER (PARTITION BY product_name ORDER BY sale_amount) AS sales_bucket
+FROM sales;
+
+
+Output:
+
+| product_name | sale_date  | sale_amount | sales_bucket |
+|--------------|------------|-------------|--------------|
+| Product A    | 2020-01-01 | 1000        | 1            |
+| Product A    | 2020-02-01 | 2000        | 2            |
+| Product A    | 2020-03-01 | 2500        | 3            |
+| Product B    | 2020-01-05 | 1500        | 1            |
+| Product B    | 2020-03-01 | 1200        | 2            |
+
+
+FORMULA:
+
+CUME_DIST() = (Rank of the current row) / (Total number of rows in the partition)
+
+PERCENT_RANK() = (Rank of the current row - 1) / (Total number of rows in the partition - 1)
+
+
+
+
+
+

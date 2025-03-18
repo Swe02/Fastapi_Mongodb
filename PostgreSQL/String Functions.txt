@@ -1,0 +1,81 @@
+SELECT 
+    -- UPPER and LOWER
+    UPPER('good morning') AS upper_case, 
+    LOWER('GOOD MORNING') AS lower_case,
+
+upper_case
+-----------------
+GOOD MORNING
+
+lower_case
+-----------------
+good morning
+
+
+    -- INITCAP
+    INITCAP('good morning everyone') AS initcap_case,
+
+initcap_case
+-------------------------------
+Good Morning Everyone
+
+
+    -- LEFT and RIGHT
+    LEFT('goodbye', 4) AS left_4_chars, 
+    LEFT('goodbye', -4) AS left_negative_4_chars,
+    RIGHT('goodbye', 4) AS right_4_chars,
+    RIGHT('goodbye', -3) AS right_negative_3_chars,
+
+left_4_chars
+-----------------
+good
+
+left_negative_4_chars
+-----------------
+goo
+
+right_4_chars
+-----------------
+bye
+
+right_negative_3_chars
+-----------------
+bye
+
+
+    -- REVERSE
+    REVERSE('goodbye') AS reverse_string,
+
+
+reverse_string
+-----------------
+eybdog
+
+
+    -- SUBSTRING
+    SUBSTRING('ANTARCTICA', 4, 4) AS substring_4th_to_7th_char,
+
+
+substring_4th_to_7th_char
+-----------------
+ARCT
+
+
+    -- REPLACE
+    REPLACE('apple pie is my favorite pie', 'pie', 'cake') AS replaced_string,
+
+
+replaced_string
+----------------------------------------
+apple cake is my favorite cake
+
+
+    -- SPLIT_PART
+    SPLIT_PART('contact@mywebsite.com', '@', 1) AS split_part_before_at_symbol
+
+
+split_part_before_at_symbol
+------------------------
+contact
+
+;

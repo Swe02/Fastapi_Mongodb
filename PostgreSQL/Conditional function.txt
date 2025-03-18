@@ -1,0 +1,42 @@
+---Movie Names and Box Office Status:
+
+SELECT movie_name,
+       CASE 
+           WHEN box_office_revenue >= 3 * budget THEN 'Smash'
+           WHEN box_office_revenue >= 1.5 * budget THEN 'Hit'
+           ELSE 'Flop'
+       END as box_office_performance
+FROM movies;
+
+
+---Director's Continent Based on Nationality:
+
+SELECT director_name,
+       CASE 
+           WHEN nationality IN ('American', 'Canadian') THEN 'North America'
+           WHEN nationality IN ('British', 'French') THEN 'Europe'
+           WHEN nationality IN ('Indian', 'Chinese') THEN 'Asia'
+           WHEN nationality = 'Australian' THEN 'Oceania'
+           WHEN nationality = 'Brazilian' THEN 'South America'
+           ELSE 'Unknown'
+       END as continent
+FROM directors;
+
+
+
+--Number of Movies Suitable and Not Suitable for Children
+
+SELECT 
+    SUM(CASE WHEN age_certification IN ('U', 'PG') THEN 1 ELSE 0 END) AS suitable_for_children,
+    SUM(CASE WHEN age_certification IN ('12', '15', '18') THEN 1 ELSE 0 END) AS not_suitable_for_children
+FROM movies;
+
+
+--Average Domestic and International Takings Based on Language and Age Certificate**
+
+SELECT 
+    age_certification,
+    AVG(CASE WHEN language = 'English' THEN domestic_takings END) AS avg_domestic_english_movies,
+    AVG(CASE WHEN language != 'English' THEN international_takings END) AS avg_international_non_english_movies
+FROM movies
+GROUP BY age_certification;

@@ -1,0 +1,18 @@
+1. COALESCE Function
+
+The COALESCE() function in SQL returns the first non-null value from a list of expressions.
+It evaluates expressions from left to right and returns the first non-NULL value.
+
+---Return movie names and languages, but if the language is English, return NULL instead using COALESCE:
+
+SELECT 
+    movie_name,
+    COALESCE(NULLIF(language, 'English'), NULL) AS movie_language
+FROM movies;
+
+
+---other:
+
+SELECT COALESCE(NULL, NULL,2) AS result;
+
+output:- 2

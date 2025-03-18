@@ -1,0 +1,24 @@
+1. GREATEST() Function
+The GREATEST() function returns the largest value from a list of expressions.
+
+Example:
+
+SELECT GREATEST(10, 20, 30, 40) AS max_value;
+Output:
+
+max_value
+-----------
+40
+
+
+2. LEAST() Function
+The LEAST() function returns the smallest value from a list of expressions.
+
+Example:
+
+SELECT LEAST(10, 20, 30, 40) AS min_value;
+Output:
+
+min_value
+-----------
+10

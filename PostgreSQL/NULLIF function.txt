@@ -1,0 +1,18 @@
+---Return the difference between domestic and international takings, but if the values are equal, return NULL:
+
+SELECT 
+    movie_name,
+    NULLIF(domestic_takings, international_takings) AS takings_difference
+FROM movies;
+
+
+--other:
+
+SELECT NULLIF(100, 100) AS result1, 
+       NULLIF(100, 200) AS result2;
+
+output:
+
+result1 | result2
+----------------------
+NULL    | 100
